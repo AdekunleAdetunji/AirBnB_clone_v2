@@ -3,8 +3,18 @@
 import models
 from models.base_model import BaseModel, Base
 from models.review import Review
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from models.amenity import Amenity
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+
+
+place_amenity = Table('place_amenity', Base.metadata,
+                      Column("place_id", String(60), ForeignKey(
+                          "places.id"), primary_key=True, nullable=False),
+                      Column("amenity_id", String(60),
+                             ForeignKey("amenities.id"),
+                             primary_key=True, nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -20,6 +30,8 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, default=0, nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    amenities = relationship("Amenity", backref="amenities",
+                             secondary="place_amenity", viewonly=False)
     amenity_ids = []
     reviews = relationship("Review", backref="places",
                            cascade="all, delete, delete-orphan")
@@ -29,3 +41,15 @@ class Place(BaseModel, Base):
         "getter for reviews when using file storage"
         all = models.storage.all(Review)
         return [v for v in all.values() if v.place_id == self.id]
+
+    @property
+    def amenities(self):
+        """getter for amenities in file storage"""
+        all = models.storage.all(Amenity)
+        return [v for v in all.values() if v.id in self.amenity_ids]
+
+    @amenities.setter
+    def amenities(self, obj):
+        """adds amenities to a place in file storage mode"""
+        if type(obj) is Amenity and obj.id not in self.amenity_ids:
+            self.amenity_ids.append[obj.id]
