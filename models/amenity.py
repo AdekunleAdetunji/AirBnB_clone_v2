@@ -9,5 +9,3 @@ class Amenity(BaseModel, Base):
     """Class representing amenities"""
     __tablename__ = "amenities"
     name = Column(String(128), nullable=False)
-    place_amenity = relationship(
-        "Place", secondary="place_amenity", backref="place_amenity")
