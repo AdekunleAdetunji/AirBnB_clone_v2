@@ -10,7 +10,6 @@ from pathlib import Path
 
 
 env.hosts = ['3.90.82.95', '54.157.156.207']
-env.user = ['ubuntu']
 
 
 def do_deploy(archive_path):
