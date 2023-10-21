@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """ State Module for HBNB project """
+import os, models
 from models.base_model import BaseModel, Base
+from models.city import City
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -17,4 +19,10 @@ class State(BaseModel, Base):
         Getter attribute cities that returns the list of City
         instances with state_id equals to the current
         """
-        return [city for city in State.cities if city.state_id == State.id]
+        cities = models.storage.all(City)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db":
+            return([city for city in cities.values()
+                   if city.state_id == self.id])
+        else:
+            return [city for city in cities.values()
+                    if city.state_id == self.id]

@@ -84,3 +84,7 @@ class DBStorage():
         Base.metadata.create_all(self.__engine)
         Session = sessionmaker(self.__engine, expire_on_commit=False)
         self.__session = Session()
+
+    def close(self):
+        """close connection to the database on each web request"""
+        self.__session.close()
